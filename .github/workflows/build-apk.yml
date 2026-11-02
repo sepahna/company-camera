@@ -4,8 +4,7 @@ name: Build Company Camera APK
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main, master]
     paths:
       - "app/**"
       - "*.gradle.kts"
@@ -19,7 +18,6 @@ jobs:
   build:
     name: Build debug APK
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -32,18 +30,19 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+        with:
+          accept-android-sdk-licenses: true
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
 
-      - name: Build APK
+      - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
 
       - name: Upload APK
